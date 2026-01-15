@@ -1,53 +1,31 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { productService } from "../services/product.service";
-import { ProductGrid } from "../Components/product/ProductGrid";
 import { Product } from "../types/product";
-import Loader from "../Components/ui/Loader";
+import { productService } from "../services/product.service";
+import { ProductsClient } from "../Components/product/ProductsClient";
+import { BottomNavigation } from "../Components/layout/BottomNavigation";
+import HomeBanner from "@/Components/ui/HomeBanner";
+import Navbar from "@/Components/layout/Navbar";
 
-export default function HomePage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
+export const revalidate = 0; // SSR (no caching)
 
-  async function fetchProducts() {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await productService.getAll();
-      setProducts(data);
-    } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
+export default async function HomePage() {
+  let products: Product[] = [];
+
+  try {
+    products = await productService.getAll(); // SSR fetch
+  } catch (err) {
+    console.error("Failed to fetch products:", err);
   }
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  if (loading) return <Loader />;
-
-  if (error)
-    return (
-      <div className="container mx-auto p-6 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          onClick={fetchProducts}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Retry
-        </button>
-      </div>
-    );
-
+  const activeNav = "home";
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Products</h1>
-      <ProductGrid products={products} />
+    <div className=" scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-gray-100">
+      <Navbar/>
+      <HomeBanner />
+      {/* Products Client (handles filtering, categories, product grid) */}
+      <ProductsClient serverProducts={products} />
+
+      {/* Bottom Navigation */}
+      <BottomNavigation activeNav={activeNav} />
     </div>
   );
 }

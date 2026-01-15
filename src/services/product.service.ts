@@ -1,18 +1,19 @@
 import { Product } from "../types/product";
 
-const API_BASE = "/api/products";
+// Base URL for the API (from env). Must include protocol and host, e.g., http://localhost:3000
+const API_BASE = process.env.NEXT_PUBLIC_API_URL + "/api/products";
 
 export const productService = {
   // Fetch all products
   async getAll(): Promise<Product[]> {
-    const res = await fetch(`${API_BASE}/getAll`); // must match getAll.ts
+    const res = await fetch(`${API_BASE}/getAll`);
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
   },
 
   // Fetch a product by ID
   async getById(id: string): Promise<Product> {
-    const res = await fetch(`${API_BASE}/getById?id=${encodeURIComponent(id)}`); // must match getById.ts
+    const res = await fetch(`${API_BASE}/getById?id=${encodeURIComponent(id)}`);
     if (!res.ok) {
       if (res.status === 404) throw new Error("Product not found");
       throw new Error("Failed to fetch product");

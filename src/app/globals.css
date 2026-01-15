@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
+/* Root variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-body: var(--font-imprima);      /* Imprima for body */
+  --font-sans: var(--font-geist-sans);   /* Geist for headings */
+  --font-mono: var(--font-geist-mono);   /* Geist Mono for code */
 }
 
+/* Tailwind theme overrides */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +23,32 @@
   }
 }
 
+/* Body styles */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), sans-serif; /* Use Imprima for body */
+  line-height: 1.6;
 }
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans), sans-serif; /* Geist for headings */
+  color: var(--foreground);
+}
+
+/* Code / pre blocks */
+code, pre {
+  font-family: var(--font-mono), monospace; /* Geist Mono for code */
+  background-color: rgba(0,0,0,0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+/* Optional: smooth font rendering */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+

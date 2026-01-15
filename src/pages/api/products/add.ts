@@ -1,9 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+import type { NextApiRequestWithFiles } from "../../../types/next";
 import { getDb } from "../../../lib/db";
+import { upload } from "../../../lib/multer";
+import { runMiddleware } from "../../../lib/runMiddleware";
 import { Product } from "../../../types/product";
 
+export const config = {
+  api: { bodyParser: false },
+};
+
 export default async function handler(
-  req: NextApiRequest,
+  req: NextApiRequestWithFiles,
   res: NextApiResponse<Product | { error: string }>
 ) {
   if (req.method !== "POST") {
@@ -11,38 +18,45 @@ export default async function handler(
   }
 
   try {
-    const { id, ...productData } = req.body;
+    // ✅ Run multer manually
+    await runMiddleware(req, res, upload.array("images", 5));
 
-    // Validate required fields
+    const productData = JSON.parse(req.body.product);
+
     if (!productData.name || !productData.price) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const db = await getDb(); // centralized DB
+    const images = req.files.map(
+      (file) => `/uploads/${file.filename}`
+    );
 
-    // Insert the product
+    productData.image = images;
+
+    const db = await getDb();
     const result = await db.collection("products").insertOne(productData);
 
-    // Retrieve the inserted product
-    const insertedProduct = await db.collection("products").findOne({ _id: result.insertedId });
-    if (!insertedProduct) {
-      return res.status(500).json({ error: "Failed to retrieve inserted product" });
+    const inserted = await db
+      .collection("products")
+      .findOne({ _id: result.insertedId });
+
+    if (!inserted) {
+      return res.status(500).json({ error: "Insert failed" });
     }
 
-    // Map MongoDB _id to Product type
-    const productWithId: Product = {
-      id: insertedProduct._id.toString(),
-      name: insertedProduct.name,
-      price: insertedProduct.price,
-      sizes: insertedProduct.sizes,
-      category: insertedProduct.category,
-      image: insertedProduct.image,
-      description: insertedProduct.description,
+    const product: Product = {
+      id: inserted._id.toString(),
+      name: inserted.name,
+      price: inserted.price,
+      sizes: inserted.sizes,
+      category: inserted.category,
+      image: inserted.image,
+      description: inserted.description,
     };
 
-    res.status(201).json(productWithId);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to add product" });
+    res.status(201).json(product);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 }
