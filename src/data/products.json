@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Premium Tangerine Shirt",
+    "price": 257.85,
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "category": "Men",
+    "image": [
+      "https://via.placeholder.com/300x200?text=Tangerine+Shirt+1",
+      "https://via.placeholder.com/300x200?text=Tangerine+Shirt+2",
+      "https://via.placeholder.com/300x200?text=Tangerine+Shirt+3"
+    ],
+    "description": "Premium quality tangerine shirt for men, soft cotton and breathable."
+  },
+  {
+    "name": "Classic Blue Jeans",
+    "price": 199.99,
+    "sizes": ["28", "30", "32", "34", "36"],
+    "category": "Men",
+    "image": [
+      "https://via.placeholder.com/300x200?text=Blue+Jeans+1",
+      "https://via.placeholder.com/300x200?text=Blue+Jeans+2",
+      "https://via.placeholder.com/300x200?text=Blue+Jeans+3"
+    ],
+    "description": "Classic blue jeans with comfortable fit."
+  }
+]

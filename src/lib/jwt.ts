@@ -1,25 +1,31 @@
 import * as jwt from "jsonwebtoken";
 
+// Load secret from environment variables
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
   throw new Error("❌ Missing JWT_SECRET in .env.local");
 }
 
-// TypeScript now knows this is a string
 const SECRET: string = JWT_SECRET;
 
+// Define payload type for our JWTs
 export interface JwtPayload {
   id: string;
   email: string;
 }
 
+/**
+ * Sign a JWT token with a payload.
+ * Expires in 1 hour.
+ */
 export function signToken(payload: JwtPayload): string {
   return jwt.sign(payload, SECRET, {
     expiresIn: "1h",
     algorithm: "HS256",
   });
 }
+
 
 export function verifyToken(token: string): JwtPayload | null {
   try {
